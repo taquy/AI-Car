@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import os
 
 import argparse
 
@@ -32,7 +33,7 @@ def detect() :
 		cv2.waitKey(0)
 		cv2.destroyAllWindows()
 
-	else:
+	elif int(args.t) == 1:
 		cap = cv2.VideoCapture(0)
 
 		while(True):
@@ -44,6 +45,11 @@ def detect() :
 		# When everything done, release the capture
 		cap.release()
 		cv2.destroyAllWindows()
+	else:
+		files = [f for f in listdir('images') if isfile(join('images', f))]
+		os.system('mkdir detect_result')
+		for file in files:
+			cv2.imwrite('detect_result/' + f, find(cv2.imread('images/' + f)))
 
 
 detect()
