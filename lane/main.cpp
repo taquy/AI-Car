@@ -59,30 +59,29 @@ char analyzeFrame(const VideoFrameRef& frame_depth,const VideoFrameRef& frame_co
     return 'c';
 }
 
-void setup_button(){
 
-        // Setup input
+void stop(){
+    int throttle_stop = STOP_SPEED;
+    api_set_FORWARD_control( pca9685,throttle_stop);
+}
 
-        gpio->gpioExport(SW3_PIN);
-        gpio->gpioExport(SW4_PIN);
-
-        gpio->gpioSetDirection(SW3_PIN, INPUT);
-        gpio->gpioSetDirection(SW4_PIN, INPUT);
-    }
-
-int stop(){
-        int throttle_stop = STOP_SPEED;
-        api_set_FORWARD_control( pca9685,throttle_stop);
-
-    }
-
+// Set initial car speed and front wheel angle
 void setup(PCA9685 *pca9685){
     int inti_throttle= STOP_SPEED;
     double inti_angle = START_ANGLE;
-    setup_button();
-    api_pwm_pca9685_init( pca9685);
+
+    // Assign button control PIN
+    gpio->gpioExport(SW3_PIN);
+    gpio->gpioExport(SW4_PIN);
+
+    gpio->gpioSetDirection(SW3_PIN, INPUT);
+    gpio->gpioSetDirection(SW4_PIN, INPUT);
+
+    // Hardware API call
+    api_pwm_pca9685_init(pca9685);
+
     if (pca9685->error >= 0){
-        api_set_FORWARD_control( pca9685,inti_throttle);
+        api_set_FORWARD_control(pca9685,inti_throttle);
         api_set_STEERING_control(pca9685, inti_angle);
     }
 }
@@ -94,11 +93,13 @@ int init_cam()
         printf("Initialize failed\n%s\n", OpenNI::getExtendedError());
         return 0;
     }
+
     rc = device.open(ANY_DEVICE);
     if (rc != STATUS_OK) {
         printf("Couldn't open device\n%s\n", OpenNI::getExtendedError());
         return 0;
     }
+
     if (device.getSensorInfo(SENSOR_DEPTH) != NULL) {
         rc = depth.create(device, SENSOR_DEPTH);
         if (rc == STATUS_OK) {
@@ -137,6 +138,7 @@ int init_cam()
         }
     }
 }
+
 char key = 0;
 bool running = false;
 double st = 0, et = 0, fps = 0;
@@ -145,7 +147,7 @@ int frame_id = 0;
 int throttle = STOP_SPEED;
 double angle = START_ANGLE;
 
-void run(){
+void run() {
     VideoFrameRef frame_depth, frame_color;
     VideoStream* streams[] = {&depth, &color};
     Mat depthImg, colorImg, grayImage;
@@ -153,7 +155,9 @@ void run(){
     queue<Road> road_q;
     road_q.push(Road());
 
-    while (true)
+    bool isAlive = true;
+
+    while (isAlive)
     {
         st = getTickCount();
         key = getkey();
@@ -178,61 +182,69 @@ void run(){
                  break;
              }
          }
-        if( key == 's'){
-            running = !running;
-            throttle = 40;
-            api_set_FORWARD_control( pca9685,throttle);
-        }
-        if( key == 'f') {
-            stop();
-            break;
-        }
-        if( key == 'p') {
 
-            stop();
-            running = !running;
-
+        switch(key) {
+            // start car
+            case 's':
+                running = !running;
+                throttle = 40;
+                api_set_FORWARD_control( pca9685,throttle);
+                break;
+            // stop car
+            case 'f':
+                isAlive = false;
+                stop();
+                break;
+            // pause car
+            case 'p':
+                running = !running;
+                stop();
+                break;
         }
-        if( running )
+
+
+        if(running)
         {
             int readyStream = -1;
             rc = OpenNI::waitForAnyStream(streams, 2, &readyStream, SAMPLE_READ_WAIT_TIMEOUT);
             depth.readFrame(&frame_depth);
             color.readFrame(&frame_color);
+
             frame_id ++;
+
             char recordStatus = analyzeFrame(frame_depth,frame_color, depthImg, colorImg);
             //flip(colorImg, colorImg, 1);
             /////////////////////////////////////////////////////////////////////////////////////////
             ///////////////////////////// color image ///////////////////////////////////////////
             if (recordStatus == 'c') {
 
-                 if(conf::WRITE_VIDEO){
-
-                     video.write(colorImg);
-                 }
+                 if(conf::WRITE_VIDEO) video.write(colorImg);
 
                  angle = processImg(colorImg, road_q);
                  throttle = conf::SPEED;
 
                  // control speed car
                  api_set_FORWARD_control( pca9685,throttle);
+
                  // control steering car
                  api_set_STEERING_control(pca9685 , angle);
 
             }
-            ///////////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////////
+
+            // calculate FPS
             et = getTickCount();
-            fps = 1.0 / ((et-st)/freq);
+
+            fps = 1.0 / ((et - st) / freq);
+
             cerr << "FPS: "<< fps<< '\n';
+
             waitKey(10);
-            if( key == 27 ) break;
+
+            if (key == 27) break;
         }
     }
 
-    if(conf::WRITE_VIDEO){
-        video.release();
-    }
+    if(conf::WRITE_VIDEO) video.release();
 }
 
 

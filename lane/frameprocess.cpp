@@ -8,12 +8,6 @@
 using namespace std;
 using namespace cv;
 
-// reference angle of API
-double map2 (double x, int in_min, int in_max, int out_min, int out_max){
-    double toReturn =  (double)(1.0 * (x - in_min) * (out_max - out_min) /
-            (in_max - in_min) + out_min );
-    return toReturn;
-}
 
 // reference angle
 double alluse(double angle) {
@@ -186,12 +180,8 @@ int testVideo(string filename){
 
         int k = waitKey(conf::WAIT_KEY) & 0xff;
 
-        if(k == 27){
-            break;
-        }
-        if(k == 32){
-            waitKey();
-        }
+        if(k == 27) break;
+        if(k == 32) waitKey();
 
         total_time += (double)(clock() - c1)/CLOCKS_PER_SEC;
         double average = (double)total_time/num_frames;
