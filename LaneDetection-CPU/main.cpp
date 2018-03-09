@@ -1,9 +1,9 @@
 #include <iostream>
 #include <frameprocess.h>
 #include <config.h>
-int main()
-{
+
+int main(){
     init();
-    testVideo("/home/nc/Desktop/color.avi");
+    testVideo("/home/ubuntu/Desktop/2.avi");
     return 0;
 }

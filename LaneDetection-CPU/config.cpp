@@ -52,9 +52,8 @@ namespace conf {
     // speed of car
     int SPEED = 48;
     int LEFT = 0;
-    int DEBUG = 1;
-    int WAIT_KEY = 30;
-
+    int DEBUG = 0;
+    int WAIT_KEY = 1;
 }
 
 namespace imp {
