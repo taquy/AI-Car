@@ -7,7 +7,7 @@
 #include <string>
 
 double alluse(double angle);
-double processImg(cv::cuda::GpuMat &src, std::queue<Road> &road_q);
+double processImg(cv::Mat &src, std::queue<Road> &road_q);
 int testVideo(std::string filename);
 
 #endif // FRAMEPROCESS_H

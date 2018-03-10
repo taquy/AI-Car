@@ -5,8 +5,54 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <dirent.h>
 #include <getfiles.h>
+#include "api_kinect_cv.h"
+
+#include "api_i2c_pwm.h"
+#include "Hal.h"
+#include "LCDI2C.h"
 
 using namespace std;
+using namespace cv;
+using namespace openni;
+using namespace EmbeddedFramework;
+
+PCA9685 *pca9685 = new PCA9685() ;
+#define HEIGHT 640
+#define WIDTH 480
+
+#define SAMPLE_READ_WAIT_TIMEOUT 1000 //2000ms
+
+#define SENSOR	166
+#define STOP_SPEED 20;
+#define START_ANGLE 0;
+
+Mat depthImg, colorImg;
+VideoFrameRef frameDepth, frameColor;
+VideoStream depth, color;
+VideoStream streamDepth, streamColor;
+
+bool analyzeFrame(const VideoFrameRef& frame_depth,const VideoFrameRef& frame_color,Mat& depth_img, Mat& color_img) {
+        DepthPixel* depth_img_data;
+        RGB888Pixel* color_img_data;
+
+        int w = frame_color.getWidth();
+        int h = frame_color.getHeight();
+
+        depth_img = Mat(h, w, CV_16U);
+        color_img = Mat(h, w, CV_8UC3);
+        Mat depth_img_8u;
+        depth_img_data = ( DepthPixel*)frame_depth.getData();
+
+        memcpy(depth_img.data, depth_img_data, h*w*sizeof(DepthPixel));
+        normalize(depth_img, depth_img_8u, 255, 0, NORM_MINMAX);
+        depth_img_8u.convertTo(depth_img, CV_8U);
+        color_img_data = (RGB888Pixel*)frame_color.getData();
+        memcpy(color_img.data, color_img_data, h*w*sizeof(RGB888Pixel));
+        cvtColor(color_img, color_img, COLOR_RGB2BGR);
+        flip(colorImg, colorImg, 1);
+        return true;
+}
+
 
 
 int train(){
@@ -81,7 +127,7 @@ void testFileImage(cv::Mat &img, cv::Ptr<cv::ml::SVM> &svm){
     findTraffic(mask, out, img2);
 
     if(!out.empty()){
-        cv::imshow("origin", out);
+        cv::imshow("out", out);
 
         cout << predict(out, svm) << endl;
     }
@@ -89,25 +135,48 @@ void testFileImage(cv::Mat &img, cv::Ptr<cv::ml::SVM> &svm){
 
 }
 
-void testCam(){
-    cv::VideoCapture video(0);
 
-    cv::Mat frame, gray;
+char key = 0;
+bool running = false;
+double st = 0, et = 0, fps = 0;
+double freq = getTickFrequency();
+int frame_id = 0;
+
+void run(){
+
+    OpenNI::initialize();
+    Device devAnyDevice;
+    devAnyDevice.open( openni::ANY_DEVICE );
+    streamDepth.create( devAnyDevice, openni::SENSOR_DEPTH );
+    streamDepth.start();
+    streamColor.create( devAnyDevice, openni::SENSOR_COLOR);
+    streamColor.start();
+
 
     cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
-    svm = cv::ml::SVM::load("/home/nc/TestSVM/data/train.txt");
+    svm = cv::ml::SVM::load("/home/ubuntu/Desktop/CDS/TestSVM/data/train.txt");
 
-    while(true){
-        video >> frame;
+    while (true)
+    {
+        st = getTickCount();
+        key = getkey();
 
-        if(frame.empty()){
-            break;
+
+
+        frame_id ++;
+        streamDepth.readFrame( &frameDepth );
+        streamColor.readFrame( &frameColor);
+        bool recordStatus = analyzeFrame(frameDepth,frameColor, depthImg, colorImg);
+
+        if (recordStatus) {
+           testFileImage(colorImg, svm);
+           imshow("origin", colorImg);
         }
 
-        testFileImage(frame, svm);
-        imshow("frame", frame);
-
-        int k = cv::waitKey(30) & 0xff;
+        et = getTickCount();
+        fps = 1.0 / ((et-st)/freq);
+        cerr << "FPS: "<< fps<< '\n';
+        int k = cv::waitKey(1) & 0xff;
 
         if(k == 27){
             break;
@@ -115,10 +184,11 @@ void testCam(){
         if(k == 32){
             cv::waitKey();
         }
+
     }
+
 }
 
 int main(){
-//    train();
-    testCam();
+    run();
 }

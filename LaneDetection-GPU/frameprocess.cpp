@@ -10,6 +10,8 @@
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaimgproc.hpp>
 #include <opencv2/cudaobjdetect.hpp>
+#include <debug.h>
+
 using namespace std;
 using namespace cv;
  double start , end;
@@ -45,6 +47,7 @@ double getTheta(cv::Point car, cv::Point dst) {
     }
 
     angle = alluse(angle);
+    cout << "new a: " << angle << endl;
 
     return angle;
 }
@@ -70,13 +73,13 @@ double processImg(cv::Mat &src, std::queue<Road> &road_q){
 
 
     birdView(thres, b);
-    cv::Mat down_img;
-    b.download(down_img);
+    cv::Mat down_bird;
+    b.download(down_bird);
 
 
     // process layer
     std::vector<Layer> layers;
-    separateLayers(down_img, layers);
+    separateLayers(down_bird, layers);
 
     for(unsigned int i = 0; i < layers.size(); i++){
         findCenterPoint(layers[i]);
@@ -89,13 +92,15 @@ double processImg(cv::Mat &src, std::queue<Road> &road_q){
 
     std::vector<Lane> copy_lanes = lanes;
 
-//    // ngaba
+    // ngaba
     Road road;
     int hasRoadInjection = ngaba(lanes, road);
 
     if(!hasRoadInjection){
         // process lanes
+        cout <<"-------------------" <<endl;
         separateLeftRight(lanes, road);
+
     }
 
     genLine(road, road_q);
@@ -104,66 +109,16 @@ double processImg(cv::Mat &src, std::queue<Road> &road_q){
 
     // show images process to debug, don't care about alrogithm
     if(conf::DEBUG){
-        Mat mask = Mat::zeros(conf::H_ROI, 2*conf::W_ROI, CV_8UC3);
-        for(Lane &lane : copy_lanes){
-            for(Point &p : lane.cnt){
-                cv::circle(mask, p, 5,cv::Scalar(0,255,255),-1);
-            }
-        }
-
-        Line *line_left = &new_r.left.line;
-        if(line_left->slope != 0){
-            line(mask, line_left->start, line_left->end, cv::Scalar(0,0,255),2);
-        }
-
-        Line *line_right = &new_r.right.line;
-        if(line_right->slope != 0){
-            line(mask, line_right->start, line_right->end, cv::Scalar(0,255,0),2);
-        }
-
-
-        line(mask, new_r.pointBot,new_r.pointTop,cv::Scalar(0,255,255),6);
-        line(mask, Point(conf::W_ROI, 0),Point(conf::W_ROI, conf::H_ROI),cv::Scalar(255,255,255),6);
-        Rect r(conf::W_ROI, 0, conf::W_ROI, conf::H_ROI);
-        cv::Mat R;
-        R = Mat(mask, r);
-
-        cv::cuda::cvtColor(down_img, down_img, cv::COLOR_GRAY2BGR);
-        down_img.copyTo(R);
-
-        Mat mask2 = Mat::zeros(conf::H_ROI + conf::H_CUT, conf::W_CUT, CV_8UC3);
-        r = Rect(0,0, mask.size().width, mask.size().height);
-
-        R = Mat(mask2, r);
-        mask.copyTo(R);
-
-        r = Rect(0,conf::H_ROI, mask2.size().width, conf::H_CUT);
-        R = Mat(mask2, r);
-
-        roi.copyTo(R);
-
-        int H_MASK_NEW = 320;
-        int W_MASK_NEW = (int)(H_MASK_NEW*mask2.size().width/mask2.size().height);
-
-        int H_SRC_NEW = H_MASK_NEW;
-        int W_SRC_NEW = (int)(H_SRC_NEW*conf::WIDTH/conf::HEIGHT);
-
-        resize(mask2, mask2, Size(W_MASK_NEW, H_MASK_NEW));
-        resize(src, src, Size(W_SRC_NEW, H_SRC_NEW));
-
-        Mat mask3;
-        hconcat(mask2, src, mask3);
-        imshow("debug", mask3);
-
+        Mat down_roi;
+        roi.download(down_roi);
+        draw(src, down_roi, down_bird, new_r, copy_lanes);
     }
 
-    src = down_img;
+
     layers.clear();
     lanes.clear();
 
     return getTheta(new_r.pointBot, new_r.pointTop);
-
-    return 0;
 }
 
 // test image processing from video

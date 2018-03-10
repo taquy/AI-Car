@@ -61,7 +61,9 @@ SOURCES += main.cpp \
     lineprocess.cpp \
     pointprocess.cpp \
     road.cpp \
-    utils.cpp
+    utils.cpp \
+    detector.cpp \
+    debug.cpp
 
 HEADERS += \
     config.h \
@@ -74,4 +76,6 @@ HEADERS += \
     line.h \
     lineprocess.h \
     pointsprocess.h \
-    road.h
+    road.h \
+    detector.h \
+    debug.h

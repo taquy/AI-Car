@@ -16,6 +16,7 @@ void separateLayers(cv::Mat &src, std::vector<Layer> &layers){
         cv::Mat sub = src(roi);
         layers.push_back(Layer(sub, roi.x, roi.y));
     }
+    std::cout<< "!2312" << std::endl;
 
     roi.y = 0;
     roi.height = conf::H_ROI - conf::H_LAYER*(conf::NUMLAYERS - 1);
@@ -88,7 +89,7 @@ void findCenterPoint(Layer &layer){
 
     // find contours
     std::vector<std::vector<cv::Point>> contours;
-    //findCnts(layer.img, contours);
+    findCnts(layer.img, contours);
 
     int cX, cY;
     cv::Moments M;
@@ -113,5 +114,5 @@ void findCenterPoint(Layer &layer){
 void findPoints(Layer &layer){
     // find contours
     std::vector<std::vector<cv::Point>> contours;
-    //findCnts(layer.img, contours);
+    findCnts(layer.img, contours);
 }

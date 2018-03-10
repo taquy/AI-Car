@@ -57,7 +57,9 @@ SOURCES       = ../../LaneDetection-GPU/main.cpp \
 		../../LaneDetection-GPU/lineprocess.cpp \
 		../../LaneDetection-GPU/pointprocess.cpp \
 		../../LaneDetection-GPU/road.cpp \
-		../../LaneDetection-GPU/utils.cpp 
+		../../LaneDetection-GPU/utils.cpp \
+		../../LaneDetection-GPU/detector.cpp \
+		../../LaneDetection-GPU/debug.cpp 
 OBJECTS       = main.o \
 		config.o \
 		frameprocess.o \
@@ -70,7 +72,9 @@ OBJECTS       = main.o \
 		lineprocess.o \
 		pointprocess.o \
 		road.o \
-		utils.o
+		utils.o \
+		detector.o \
+		debug.o
 DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/unix.conf \
@@ -288,7 +292,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/LaneDetection-GPU1.0.0 || mkdir -p .tmp/LaneDetection-GPU1.0.0
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/LaneDetection-GPU1.0.0/ && $(COPY_FILE) --parents ../../LaneDetection-GPU/config.h ../../LaneDetection-GPU/frameprocess.h ../../LaneDetection-GPU/getparam.h ../../LaneDetection-GPU/imageprocess.h ../../LaneDetection-GPU/lane.h ../../LaneDetection-GPU/laneprocess.h ../../LaneDetection-GPU/layer.h ../../LaneDetection-GPU/line.h ../../LaneDetection-GPU/lineprocess.h ../../LaneDetection-GPU/pointsprocess.h ../../LaneDetection-GPU/road.h .tmp/LaneDetection-GPU1.0.0/ && $(COPY_FILE) --parents ../../LaneDetection-GPU/main.cpp ../../LaneDetection-GPU/config.cpp ../../LaneDetection-GPU/frameprocess.cpp ../../LaneDetection-GPU/getparam.cpp ../../LaneDetection-GPU/imageprocess.cpp ../../LaneDetection-GPU/lane.cpp ../../LaneDetection-GPU/laneprocess.cpp ../../LaneDetection-GPU/layer.cpp ../../LaneDetection-GPU/line.cpp ../../LaneDetection-GPU/lineprocess.cpp ../../LaneDetection-GPU/pointprocess.cpp ../../LaneDetection-GPU/road.cpp ../../LaneDetection-GPU/utils.cpp .tmp/LaneDetection-GPU1.0.0/ && (cd `dirname .tmp/LaneDetection-GPU1.0.0` && $(TAR) LaneDetection-GPU1.0.0.tar LaneDetection-GPU1.0.0 && $(COMPRESS) LaneDetection-GPU1.0.0.tar) && $(MOVE) `dirname .tmp/LaneDetection-GPU1.0.0`/LaneDetection-GPU1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/LaneDetection-GPU1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/LaneDetection-GPU1.0.0/ && $(COPY_FILE) --parents ../../LaneDetection-GPU/config.h ../../LaneDetection-GPU/frameprocess.h ../../LaneDetection-GPU/getparam.h ../../LaneDetection-GPU/imageprocess.h ../../LaneDetection-GPU/lane.h ../../LaneDetection-GPU/laneprocess.h ../../LaneDetection-GPU/layer.h ../../LaneDetection-GPU/line.h ../../LaneDetection-GPU/lineprocess.h ../../LaneDetection-GPU/pointsprocess.h ../../LaneDetection-GPU/road.h ../../LaneDetection-GPU/detector.h ../../LaneDetection-GPU/debug.h .tmp/LaneDetection-GPU1.0.0/ && $(COPY_FILE) --parents ../../LaneDetection-GPU/main.cpp ../../LaneDetection-GPU/config.cpp ../../LaneDetection-GPU/frameprocess.cpp ../../LaneDetection-GPU/getparam.cpp ../../LaneDetection-GPU/imageprocess.cpp ../../LaneDetection-GPU/lane.cpp ../../LaneDetection-GPU/laneprocess.cpp ../../LaneDetection-GPU/layer.cpp ../../LaneDetection-GPU/line.cpp ../../LaneDetection-GPU/lineprocess.cpp ../../LaneDetection-GPU/pointprocess.cpp ../../LaneDetection-GPU/road.cpp ../../LaneDetection-GPU/utils.cpp ../../LaneDetection-GPU/detector.cpp ../../LaneDetection-GPU/debug.cpp .tmp/LaneDetection-GPU1.0.0/ && (cd `dirname .tmp/LaneDetection-GPU1.0.0` && $(TAR) LaneDetection-GPU1.0.0.tar LaneDetection-GPU1.0.0 && $(COMPRESS) LaneDetection-GPU1.0.0.tar) && $(MOVE) `dirname .tmp/LaneDetection-GPU1.0.0`/LaneDetection-GPU1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/LaneDetection-GPU1.0.0
 
 
 clean:compiler_clean 
@@ -325,12 +329,32 @@ compiler_clean:
 
 ####### Compile
 
-main.o: ../../LaneDetection-GPU/main.cpp ../../LaneDetection-GPU/frameprocess.h \
-		../../LaneDetection-GPU/road.h \
-		../../LaneDetection-GPU/lane.h \
-		../../LaneDetection-GPU/line.h \
+main.o: ../../LaneDetection-GPU/main.cpp ../../../../DriverlessCarChallenge/jetson/carControl/src/0.3/stereo_vision/api_kinect_cv.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/OpenNI.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/OniPlatform.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/Win32/OniPlatformWin32.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/Android-Arm/OniPlatformAndroid-Arm.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/Linux-x86/OniPlatformLinux-x86.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/Linux-Arm/OniPlatformLinux-Arm.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/MacOSX/OniPlatformMacOSX.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/OniProperties.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/OniEnums.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/OniCAPI.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/OniCTypes.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/OniCEnums.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/OniCProperties.h \
+		../../../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include/OniVersion.h \
+		../../../../DriverlessCarChallenge/jetson/carControl/src/0.3/peripheral_driver/i2c/api_i2c_pwm.h \
+		../../../../DriverlessCarChallenge/jetson/carControl/src/0.3/peripheral_driver/i2c/JHPWMPCA9685.h \
+		../../../../DriverlessCarChallenge/jetson/carControl/src/0.3/HAL/Hal.h \
+		../../../../DriverlessCarChallenge/jetson/carControl/src/0.3/HAL/LCDI2C.h \
 		../../LaneDetection-GPU/config.h \
-		../../LaneDetection-GPU/getparam.h
+		../../LaneDetection-GPU/getparam.h \
+		../../LaneDetection-GPU/line.h \
+		../../LaneDetection-GPU/detector.h \
+		../../LaneDetection-GPU/frameprocess.h \
+		../../LaneDetection-GPU/road.h \
+		../../LaneDetection-GPU/lane.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../LaneDetection-GPU/main.cpp
 
 config.o: ../../LaneDetection-GPU/config.cpp ../../LaneDetection-GPU/config.h \
@@ -411,6 +435,12 @@ utils.o: ../../LaneDetection-GPU/utils.cpp ../../LaneDetection-GPU/road.h \
 		../../LaneDetection-GPU/config.h \
 		../../LaneDetection-GPU/getparam.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o utils.o ../../LaneDetection-GPU/utils.cpp
+
+detector.o: ../../LaneDetection-GPU/detector.cpp ../../LaneDetection-GPU/detector.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o detector.o ../../LaneDetection-GPU/detector.cpp
+
+debug.o: ../../LaneDetection-GPU/debug.cpp ../../LaneDetection-GPU/debug.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug.o ../../LaneDetection-GPU/debug.cpp
 
 ####### Install
 

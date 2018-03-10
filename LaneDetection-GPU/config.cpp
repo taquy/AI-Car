@@ -21,7 +21,7 @@ namespace conf {
     // config for image processing
     int THRES = 200;
     int NUMLAYERS = 25;
-    int MIN_AREA_CNT = 30;
+    int MIN_AREA_CNT = 50;
 
 
 
@@ -50,11 +50,11 @@ namespace conf {
     int BIRD = 15;
 
     // speed of car
-    int SPEED = 48;
-    int LEFT = 0;
+    int SPEED = 50;
+    int LEFT = 1;
     int DEBUG = 0;
     int WAIT_KEY = 1;
-
+    int WRITE_VIDEO = 0;
 }
 
 namespace imp {

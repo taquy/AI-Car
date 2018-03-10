@@ -47,6 +47,7 @@ namespace conf {
 
     extern int DEBUG;
     extern int WAIT_KEY;
+    extern int WRITE_VIDEO;
 }
 
 namespace imp {
