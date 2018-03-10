@@ -1,0 +1,61 @@
+ 1788  git init
+ 1789  git ping google.com
+ 1790  ping google.com
+ 1791  ping http://google.com
+ 1792  cd '/home/ubuntu/DriverlessCarChallenge (2)/jetson/carControl/src/0.3/stereo_vision' 
+ 1793  sudo make
+ 1794  cd '/home/ubuntu/Desktop/Q2/train' 
+ 1795  sudo make
+ 1796  sudo ./train
+ 1797  cd '/home/ubuntu/Desktop/Q2/test' 
+ 1798  sudo cmake .
+ 1799  sudo make
+ 1800  sudo ./test
+ 1801  cd '/home/ubuntu/Desktop/Q2/train' 
+ 1802  sudo cmake .
+ 1803  sudo make
+ 1804  cd '/home/ubuntu/Desktop/Q2/test' 
+ 1805  sudo make
+ 1806  sudo ./test
+ 1807  git --version
+ 1808  git
+ 1809  git --version
+ 1810  cd /home/ubuntu/Desktop/x
+ 1811  git pull origin master
+ 1812  ls
+ 1813  git pull origin master
+ 1814  cd /home/ubuntu/Desktop/x
+ 1815  git init 
+ 1816  git remote add origin https://github.com/hamzoni/AI-Car.git
+ 1817  git add -A
+ 1818  git commit -m ""
+ 1819  git push origin master --force
+ 1820  touch x
+ 1821  git add -A
+ 1822  git commit -m ""
+ 1823  git commit -m "empty"
+ 1824  git push origin master --force
+ 1825  touch y
+ 1826  git add -A
+ 1827  git commit -m "empty"
+ 1828  git push origin master --force
+ 1829  git config.username
+ 1830  git --hel
+ 1831  git --help
+ 1832  git config global.name
+ 1833  git --config global.name
+ 1834  git --config global
+ 1835  git --config
+ 1836  git --help
+ 1837  git config --global user.name
+ 1838  git config --global user
+ 1839  git config --global user.name "quyta"
+ 1840  git config --global user
+ 1841  git config --global user.name
+ 1842  git config --global user.name "prototype"
+ 1843  git conf-g --global
+ 1844  git conf-g --global --help
+ 1845  git conf-g --global user.email
+ 1846  git confi-g --global user.email
+ 1847  git config --global user.email
+

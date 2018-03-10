@@ -84,19 +84,14 @@ double processImg(cv::Mat &src, std::queue<Road> &road_q){
 
     // ngaba
     Road road;
-    int isHasRoadInjection = ngaba(lanes, road);
+    int hasRoadInjection = ngaba(lanes, road);
 
-    if(!isHasRoadInjection){
+    if(!hasRoadInjection){
         // process lanes
-
         separateLeftRight(lanes, road);
     }
 
-
     genLine(road, road_q);
-
-
-
     Road new_r = road_q.front();
 
 
@@ -179,8 +174,13 @@ int testVideo(string filename){
 
     road_q.push(Road());
 
+    double freq = getTickFrequency();
+    double st = 0, et = 0, fps = 0;
+    double sum_fps = 0;
+
     while(true){
-        clock_t c1 = clock();
+        st = getTickCount();
+
         Mat frame;
         video >> frame;
 
@@ -202,9 +202,9 @@ int testVideo(string filename){
             waitKey();
         }
 
-        total_time += (double)(clock() - c1)/CLOCKS_PER_SEC;
-        double average = (double)total_time/num_frames;
-        cout << average << "---" << 1/average << endl << endl;
+        et = getTickCount();
+        sum_fps += 1.0 / ((et-st)/freq);
+        cerr << "FPS: "<< sum_fps/num_frames << ' ';
         frame.release();
     }
     video.release();
