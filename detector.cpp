@@ -1,25 +1,13 @@
 
-#include <iostream>
-#include <stdio.h>
-
-
-using namespace std;
-
-
 #include "detector.h"
-#include "opencv2/objdetect/objdetect.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 
-using namespace cv;
+cv::String modeldir = "/home/taquy/Projects/cpp/GPUTrafficSignDetector/models/";
 
-String modeldir = "/home/taquy/Projects/cpp/GPUTrafficSignDetector/models/";
+cv::String stop_model = modeldir + "stop.xml";
+cv::String left_model = modeldir + "left.xml";
+cv::String right_model = modeldir + "right.xml";
 
-String stop_model = modeldir + "stop.xml";
-String left_model = modeldir + "left.xml";
-String right_model = modeldir + "left.xml";
-
-RNG rng(12345);
+//cv::RNG rng(12345);
 
 Detector::Detector() {
     this->signName = {"STOP", "LEFT", "RIGHT"};
@@ -29,80 +17,98 @@ Detector::Detector() {
         cv::cuda::CascadeClassifier::create(right_model)
     };
     this->signId = -1;
-
-    this->stop_difficult = 13;
-    this->left_difficult = 17;
-
     // Distance calculate
     this->w1 = (double) 170; // px
     this->d1 = (double) 20; // cm
-
 }
 
+int Detector::difficulty[3] = {15, 18, 18};
+
+//                              T    R    B  L
+double Detector::boundbox[4] = {0.2, 0.2, 0.2, 0.2};
+
+cv::Mat Detector::splitter(cv::Mat img) {
+    cv::Rect box = this->cropbox(img);
+    return img(box);
+}
+
+cv::Rect Detector::cropbox(cv::Mat frame) {
+    double w = frame.cols;
+    double h = frame.rows;
+    double x = w * this->boundbox[3];
+    double y = h * this->boundbox[0];
+    double w2 = w - w * (this->boundbox[1] + this->boundbox[3]);
+    double h2 = h - h * (this->boundbox[0] + this->boundbox[2]);
+    return cv::Rect(x, y, w2, h2);
+}
 
 double Detector::calcDistance (double w2) {
     return (this->w1 * this->d1) / w2;
 }
 
-
-
 std::vector<cv::Rect> Detector::detectGpu(cv::cuda::GpuMat grayMat, int signId) {
     grayMat = grayMat.clone();
+
     cv::Ptr<cv::cuda::CascadeClassifier> gpuCascade = this->classifiers[signId];
 
     std::vector<cv::Rect> boxes;
 
     cv::cuda::GpuMat gpuFound;
 
-
-    gpuCascade->setMinNeighbors(15);
+    gpuCascade->setMinNeighbors(this->difficulty[signId]);
     gpuCascade->detectMultiScale(grayMat, gpuFound);
     gpuCascade->convert(gpuFound, boxes);
-
 
     return boxes;
 }
 
-Mat thread_method(int thread_id, Mat frame) {
-}
-
-int Detector::getID(Mat frame) {
+int Detector::getID(cv::Mat frame) {
+    cv::Mat area = frame.clone();
+    area = this->splitter(area);
 
     cv::cuda::GpuMat gpuMat, grayMat;
-    gpuMat.upload(frame.clone());
+
+    gpuMat.upload(area);
+
     cv::cuda::cvtColor(gpuMat, grayMat, cv::COLOR_BGR2GRAY);
-//        cv::cuda::histEven(gpuFrame, gpuFrame);
 
     int n = this->signName.size();
-    std::thread threads[n];
-    for (int i = 0; i < n; i++) {
-        threads[i] = std::thread(thread_method, i, frame);
-        std::vector<cv::Rect> boxes = this->detectGpu(grayMat, i);
-        frame = this->draw(frame, boxes, this->signName[i]);
 
-    }
+//    std::vector<cv::Rect> boxes;
 
+    std::vector<cv::Rect> boxes1 = this->detectGpu(grayMat, Detector::STOP);
+//    if (boxes.size() > 0) return Detector::STOP;
 
+    std::vector<cv::Rect> boxes2 = this->detectGpu(grayMat, Detector::LEFT);
+//    if (boxes.size() > 0) return Detector::LEFT;
 
-    cv::imshow("result", frame);
+    std::vector<cv::Rect> boxes3 = this->detectGpu(grayMat, Detector::RIGHT);
+//    if (boxes.size() > 0) return Detector::RIGHT;
 
-
-//    std::vector<cv::Rect> boxes = this->detectGpu(grayMat, 0);
-//    frame = this->draw(frame, boxes, this->signName[0]);
-
+    frame = this->draw(frame, boxes1, this->signName[Detector::STOP]);
+    frame = this->draw(frame, boxes2, this->signName[Detector::LEFT]);
+    frame = this->draw(frame, boxes3, this->signName[Detector::RIGHT]);
+    imshow("test", frame);
 
     return -1;
 }
 
-Mat Detector::draw(Mat frame, vector<Rect> boxes, String label) {
+cv::Mat Detector::draw(cv::Mat frame, vector<cv::Rect> boxes, cv::String label) {
+    // draw frontier line
+    cv::Rect box = this->cropbox(frame);
+    rectangle(frame, cv::Point(box.x, box.y), cv::Point(box.x + box.width, box.y + box.height), cv::Scalar(255,255,255), 2);
+
+    // draw rects
     for( size_t i = 0; i < boxes.size(); i++ )
     {
-        Point a(boxes[i].x, boxes[i].y);
-        Point b(boxes[i].x + boxes[i].width, boxes[i].y + boxes[i].height);
+        int x = boxes[i].x + box.x;
+        int y = boxes[i].y + box.y;
+        cv::Point a(x, y);
+        cv::Point b(x + boxes[i].width, y + boxes[i].height);
 
-        rectangle(frame, a, b, Scalar(0, 255, 0), 3);
+        cv::rectangle(frame, a, b, cv::Scalar(0, 255, 0), 3);
 
-        putText(frame, label, a, FONT_HERSHEY_SIMPLEX, 1, (0, 125, 255), 3, 0, false);
+        cv::putText(frame, label, a, cv::FONT_HERSHEY_SIMPLEX, 1, (0, 125, 255), 3, 0, false);
     }
     return frame;
 }

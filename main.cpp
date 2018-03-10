@@ -27,18 +27,32 @@ using namespace std;
 
 #include <opencv2/gpu/gpu.hpp>
 
+Mat imgsplitter(Mat img, double percentage) {
+    double height = img.rows * (percentage / (double) 100) - 1;
+    return img(cv::Range(0, height), cv::Range(0, img.cols - 1));
+}
+
+
+double st = 0, et = 0, fps = 0;
+double freq = getTickFrequency();
 
 int main (int argc, char* argv[])
 {
     VideoCapture cap(0);
     Detector *detector = new Detector();
     while (1) {
+        st = getTickCount();
+
+
         Mat frame;
         cap >> frame;
 
-        detector->getID(frame);
+        int id = detector->getID(frame);
+        cout << id << endl;
 
-
+        et = getTickCount();
+        fps = 1.0 / ((et-st) / freq);
+        cerr << "FPS: "<< fps<< '\n';
         if (waitKey(1) >= 0) break;
 
     }
