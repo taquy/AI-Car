@@ -46,12 +46,12 @@ namespace conf {
     int BIRD = 15;
 
     // car
-    int SPEED = 40;
+    int SPEED = 50;
     int LEFT = 1;
 
     int DEBUG = 0;
     int WAIT_KEY = 1;
-    int WRITE_VIDEO = 0;
+    int WRITE_VIDEO = 1;
 
 }
 

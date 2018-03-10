@@ -9,8 +9,6 @@ CONFIG -= app_bundle
 
 
 TEMPLATE = app
-
-
 INCLUDEPATH += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/stereo_vision
 INCLUDEPATH += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/HAL
 INCLUDEPATH += /home/ubuntu/Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include
@@ -19,32 +17,32 @@ INCLUDEPATH += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/per
 
 INCLUDEPATH += -I/usr/local/include/opencv
 LIBS += -L/usr/local/lib -lopencv_cudabgsegm -lopencv_cudaobjdetect -lopencv_cudastereo -lopencv_stitching -lopencv_cudafeatures2d -lopencv_superres -lopencv_cudacodec -lopencv_videostab -lopencv_cudaoptflow -lopencv_cudalegacy -lopencv_cudawarping -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dnn -lopencv_dpm -lopencv_fuzzy -lopencv_hdf -lopencv_line_descriptor -lopencv_optflow -lopencv_plot -lopencv_reg -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_rgbd -lopencv_viz -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_face -lopencv_xfeatures2d -lopencv_shape -lopencv_video -lopencv_ximgproc -lopencv_calib3d -lopencv_features2d -lopencv_flann -lopencv_xobjdetect -lopencv_objdetect -lopencv_ml -lopencv_xphoto -lopencv_highgui -lopencv_videoio -lopencv_photo -lopencv_imgcodecs -lopencv_cudaimgproc -lopencv_cudafilters -lopencv_imgproc -lopencv_cudaarithm -lopencv_core -lopencv_cudev
-unix:!macx: LIBS += -L$$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release/ -lkinect-cv2
 
-INCLUDEPATH += $$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
-DEPENDPATH += $$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
+LIBS += -L/home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release/ -lkinect-cv2
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release/libkinect-cv2.a
+INCLUDEPATH += /home/ubuntuDriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
+DEPENDPATH += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
 
-unix:!macx: LIBS += -L$$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release/ -li2c-pwm
+PRE_TARGETDEPS += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release/libkinect-cv2.a
 
-INCLUDEPATH += $$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
-DEPENDPATH += $$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
+LIBS += -L/home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release/ -li2c-pwm
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release/libi2c-pwm.a
+INCLUDEPATH += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
+DEPENDPATH += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
 
-unix:!macx: LIBS += -L$$PWD/../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Samples/Bin/ -lOpenNI2
+PRE_TARGETDEPS += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release/libi2c-pwm.a
 
-INCLUDEPATH += $$PWD/../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Samples/Bin
-DEPENDPATH += $$PWD/../../Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Samples/Bin
+LIBS += -L/home/ubuntu/Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Samples/Bin/ -lOpenNI2
 
-unix:!macx: LIBS += -L$$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/HAL/ -lHAL
+INCLUDEPATH += /home/ubuntu/Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Samples/Bin
+DEPENDPATH += /home/ubuntu/Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Samples/Bin
 
-INCLUDEPATH += $$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/HAL
-DEPENDPATH += $$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/HAL
+LIBS += -L/home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/HAL/ -lHAL
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/../../DriverlessCarChallenge/jetson/carControl/src/0.3/HAL/libHAL.a
+INCLUDEPATH += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/HAL
+DEPENDPATH += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/HAL
 
+PRE_TARGETDEPS += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/HAL/libHAL.a
 
 SOURCES += \
     imageprocess.cpp \
@@ -72,10 +70,8 @@ HEADERS += \
     laneprocess.h \
     lineprocess.h \
     road.h \
-    control.h \
     readcam.h \
     frameprocess.h \
     getparam.h \
-    detector.h \
-    testtack.h
+    detector.h
 

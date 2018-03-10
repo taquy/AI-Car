@@ -17,8 +17,7 @@
 
 using namespace std;
 using namespace cv;
-using namespace openni;
-using namespace EmbeddedFramework;
+using namespace openni;using namespace EmbeddedFramework;
 
 PCA9685 *pca9685 = new PCA9685() ;
 #define HEIGHT 640
@@ -36,6 +35,7 @@ VideoStream depth, color;
 VideoStream streamDepth, streamColor;
 
 VideoWriter video("/home/ubuntu/Desktop/LaneDetection/color.avi",CV_FOURCC('M','J','P','G'),25, Size(640,480));
+VideoWriter video2("/home/ubuntu/Desktop/LaneDetection/color1.avi",CV_FOURCC('M','J','P','G'),25, Size(640,480));
 
 char analyzeFrame(const VideoFrameRef& frame_depth,const VideoFrameRef& frame_color,Mat& depth_img, Mat& color_img) {
         DepthPixel* depth_img_data;
@@ -54,8 +54,8 @@ char analyzeFrame(const VideoFrameRef& frame_depth,const VideoFrameRef& frame_co
                 color_img_data = (RGB888Pixel*)frame_color.getData();
                 memcpy(color_img.data, color_img_data, h*w*sizeof(RGB888Pixel));
                 cvtColor(color_img, color_img, COLOR_RGB2BGR);
-//                cv::imshow("d",depth_img_8u);
-//                cv::imshow("depth", color_img);
+                cv::imshow("d",depth_img_8u);
+                cv::imshow("depth", color_img);
 
                 return 'c';
 }
@@ -92,7 +92,6 @@ void run(){
     streamColor.create( devAnyDevice, openni::SENSOR_COLOR);
     streamColor.start();
 
-
     queue<Road> road_q;
     road_q.push(Road());
 
@@ -127,11 +126,14 @@ void run(){
             //flip(colorImg, colorImg, 1);
             ///////////////////////////// color image ///////////////////////////////////////////
             if (recordStatus == 'c') {
-
-//                 if(conf::WRITE_VIDEO){
-//                     video.write(colorImg);
-//                 }
-                   cv::imshow("depth", depthImg);
+                Mat gray;
+                 if(conf::WRITE_VIDEO){
+                     cvtColor(depthImg, gray, CV_GRAY2RGB);
+                     video.write(gray);
+                     video2.write(colorImg);
+                 }
+//                   cv::imshow("depth", depthImg);
+//                   cv::imshow("color", gray);
 //                 angle = processImg(colorImg, road_q);
                    throttle = conf::SPEED;
 //                 api_set_FORWARD_control( pca9685,throttle);
@@ -147,6 +149,7 @@ void run(){
     }
     if(conf::WRITE_VIDEO){
         video.release();
+        video2.release();
     }
 }
 
