@@ -20,12 +20,55 @@ Detector::Detector() {
     // Distance calculate
     this->w1 = (double) 170; // px
     this->d1 = (double) 20; // cm
+
+    // Scoring approximate
+    this->isDetect = true;
+    this->maxFrame = 10;
+    this->crrFrame = 0;
+    delete[] this->score;
+    this->score = new int[3] {0,0,0};
+
+    // Debug
+    this->isDebug = true;
 }
 
-int Detector::difficulty[3] = {15, 18, 18};
+int Detector::difficulty[3] = {15, 25, 25};
 
-//                              T    R    B  L
-double Detector::boundbox[4] = {0.2, 0.2, 0.2, 0.2};
+//                              T     R     B     L
+double Detector::boundbox[4] = {00.0, 00.0, 00.0, 00.0};
+
+void Detector::getProxID(cv::Mat frame) {
+    if (!this->isDetect) {
+        std::cout << "Finish. Confirm sign detected: ";
+        std::cout << this->signName[this->signId] << std::endl;
+        return;
+    }
+
+    this->crrFrame++;
+
+    int dId = this->getID(frame);
+    if (dId == -1) return;
+
+    cout << "Detected: " + this->signName[dId];
+    cout << " @" + std::to_string(this->crrFrame) << endl;
+
+    this->score[dId]++;
+
+    if(this->score[dId] >= this->maxFrame) {
+        this->signId = dId;
+        this->isDetect = false;
+    }
+
+}
+
+void Detector::reset() {
+    this->signId = -1;
+    this->isDetect = true;
+    this->maxFrame = 10;
+    this->crrFrame = 0;
+    delete[] this->score;
+    this->score = new int[3] {0,0,0};
+}
 
 cv::Mat Detector::splitter(cv::Mat img) {
     cv::Rect box = this->cropbox(img);
@@ -62,7 +105,9 @@ std::vector<cv::Rect> Detector::detectGpu(cv::cuda::GpuMat grayMat, int signId) 
     return boxes;
 }
 
+
 int Detector::getID(cv::Mat frame) {
+
     cv::Mat area = frame.clone();
     area = this->splitter(area);
 
@@ -74,21 +119,34 @@ int Detector::getID(cv::Mat frame) {
 
     int n = this->signName.size();
 
-//    std::vector<cv::Rect> boxes;
-
     std::vector<cv::Rect> boxes1 = this->detectGpu(grayMat, Detector::STOP);
-//    if (boxes.size() > 0) return Detector::STOP;
+    if (boxes1.size() > 0) {
+        if (!this->isDebug) return Detector::STOP;
+    }
 
     std::vector<cv::Rect> boxes2 = this->detectGpu(grayMat, Detector::LEFT);
-//    if (boxes.size() > 0) return Detector::LEFT;
+    if (boxes2.size() > 0) {
+        if (!this->isDebug) return Detector::LEFT;
+    }
 
     std::vector<cv::Rect> boxes3 = this->detectGpu(grayMat, Detector::RIGHT);
-//    if (boxes.size() > 0) return Detector::RIGHT;
+    if (boxes3.size() > 0) {
+        if (!this->isDebug) return Detector::RIGHT;
+    }
 
-    frame = this->draw(frame, boxes1, this->signName[Detector::STOP]);
-    frame = this->draw(frame, boxes2, this->signName[Detector::LEFT]);
-    frame = this->draw(frame, boxes3, this->signName[Detector::RIGHT]);
-    imshow("test", frame);
+    if (this->isDebug) {
+
+        frame = this->draw(frame, boxes1, this->signName[Detector::STOP]);
+        frame = this->draw(frame, boxes2, this->signName[Detector::LEFT]);
+        frame = this->draw(frame, boxes3, this->signName[Detector::RIGHT]);
+
+        imshow("test", frame);
+//        this->selectRegion();
+
+        if (boxes1.size() > 0) return Detector::STOP;
+        if (boxes2.size() > 0) return Detector::LEFT;
+        if (boxes3.size() > 0) return Detector::RIGHT;
+    }
 
     return -1;
 }
@@ -112,3 +170,28 @@ cv::Mat Detector::draw(cv::Mat frame, vector<cv::Rect> boxes, cv::String label) 
     }
     return frame;
 }
+
+
+void Detector::selectRegion() {
+//    string wname = "test";
+//    int maxv = 100;
+
+//    int vals[] = {0, 0, 0, 0};
+//    int val = 0;
+
+//    char name[50]; sprintf(name, "T %d", maxv);
+//    cv::createTrackbar(name, wname, &val, maxv, NULL);
+
+//    char name[50]; sprintf(name, "T %d", maxv);
+//    cv::createTrackbar(name, wname, &vals[0], maxv, NULL);
+
+//    char name2[50]; sprintf(name2, "R %d", maxv);
+//    cv::createTrackbar(name2, wname, &vals[1], maxv, NULL);
+
+//    char name3[50]; sprintf(name3, "B %d", maxv);
+//    cv::createTrackbar(name3, wname, &vals[2], maxv, NULL);
+
+//    char name4[50]; sprintf(name4, "L %d", maxv);
+//    cv::createTrackbar(name4, wname, &vals[3], maxv, NULL);
+}
+

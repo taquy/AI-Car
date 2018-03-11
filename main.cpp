@@ -40,6 +40,7 @@ int main (int argc, char* argv[])
 {
     VideoCapture cap(0);
     Detector *detector = new Detector();
+
     while (1) {
         st = getTickCount();
 
@@ -47,12 +48,16 @@ int main (int argc, char* argv[])
         Mat frame;
         cap >> frame;
 
-        int id = detector->getID(frame);
-        cout << id << endl;
+        if (detector->isDetect) {
+            detector->getProxID(frame);
+        } else {
+            cv::imshow("done", frame);
+        }
+
 
         et = getTickCount();
         fps = 1.0 / ((et-st) / freq);
-        cerr << "FPS: "<< fps<< '\n';
+//        cerr << "FPS: "<< fps<< '\n';
         if (waitKey(1) >= 0) break;
 
     }
