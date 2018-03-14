@@ -1,19 +1,14 @@
 #include <getparam.h>
 
-// get matrix to bird view
-void getMatrixWrap(cv::Mat &dst, double w, double h, int bird_alpha){
+void getMatrixWrap(cv::Mat &dst, double w, double h, double alpha,
+                   double focalLength, double dist, double y){
 
     double PI = 3.1415926;
-    int alpha_ = bird_alpha, beta_ = 90, gamma_ = 90;
-    int f_ = 1616, dist_ = 565;
 
-    double focalLength, dist, alpha, beta, gamma;
+    alpha =(alpha - 90) * PI/180;
+    double beta = 0;
+    double gamma = 0;
 
-    alpha =((double)alpha_ -90) * PI/180;
-    beta =((double)beta_ -90) * PI/180;
-    gamma =((double)gamma_ -90) * PI/180;
-    focalLength = (double)f_;
-    dist = (double)dist_;
 
     // Projecion matrix 2D -> 3D
     cv::Mat A1 = (cv::Mat_<float>(4, 3)<<
@@ -43,9 +38,15 @@ void getMatrixWrap(cv::Mat &dst, double w, double h, int bird_alpha){
         0, 0, 1, 0,
         0, 0, 0, 1	);
 
+    cv::Mat RO = (cv::Mat_<float>(4, 4) <<
+        1, 0, 0, 0,
+        0, 1, 0, -y,
+        0, 0, 1, 0,
+        0, 0, 0, 1	);
+
 
     // R - rotation matrix
-    cv::Mat R = RX * RY * RZ;
+    cv::Mat R = RX * RY * RZ * RO;
 
     // T - translation matrix
     cv::Mat T = (cv::Mat_<float>(4, 4) <<

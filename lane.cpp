@@ -1,8 +1,7 @@
 #include <lane.h>
-#include <lineprocess.h>
 
 Lane::Lane(){
-    this->line = Line(0,0,0,0);
+    this->line = Line();
 }
 Lane::Lane(std::vector<cv::Point> contour){
     this->cnt = contour;
@@ -15,5 +14,5 @@ Lane::Lane(std::vector<cv::Point> contour){
     }
 
     this->line = Line( line[1]/line[0], cv::Point((int)line[2], (int)line[3]));
-    regionLine(this->line);
+
 }

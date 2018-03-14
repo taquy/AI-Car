@@ -17,43 +17,12 @@ void separateLayers(cv::Mat &src, std::vector<Layer> &layers){
 }
 
 
-//! Concatenate small layers to a imgs
-void concatenateLayers(std::vector<Layer> &layers, cv::Mat &dst){
-    dst = cv::Mat(conf::H_ROI, conf::W_ROI, CV_8UC3);
-    cv::Mat R;
-
-    cv::Rect roi(0, 0, conf::W_LAYER, conf::H_LAYER);
-
-    for(int i = 0; i < conf::NUMLAYERS - 1; i++){
-        roi.y = conf::H_ROI - (i+1)*conf::H_LAYER;
-        R = cv::Mat(dst, roi);
-        layers[i].mask.copyTo(R);
-    }
-    roi.y = 0;
-    roi.height = conf::H_ROI - conf::H_LAYER*(conf::NUMLAYERS - 1);
-    R = cv::Mat(dst, roi);
-    layers[conf::NUMLAYERS - 1].mask.copyTo(R);
-}
-
-
 //! Bird View a image
 void birdView(cv::Mat &src, cv::Mat &dst){
 
     cv::warpPerspective(src, dst, imp::matrixWrap, src.size(), cv::INTER_CUBIC | cv::WARP_INVERSE_MAP);
     dst = dst(imp::roiCut);
 
-}
-
-
-//! Take a region of image
-/*!
- * \brief roiImg
- * \param src   input image
- * \param roi   a rectangle which define the roi on the image
- * \return      roi
- */
-void roiImg(cv::Mat &src, cv::Mat &dst , cv::Rect &roi){
-    dst = src(roi);
 }
 
 //! Find contours of a image and filter contours
@@ -93,18 +62,4 @@ void findCenterPoint(Layer &layer){
 
         layer.points.push_back(cv::Point(cX, cY));
     }
-}
-
-
-//! This function will find all contours and center points of these contours on a layer
-//! Contours after finding is going to filtered
-/*!
- * \brief findPoints
- * \param layer     class Layer
- * \param isDebug   if true, contours and centers poitns will be drawn on mask of the layer
- */
-void findPoints(Layer &layer){
-    // find contours
-    std::vector<std::vector<cv::Point>> contours;
-    findCnts(layer.img, contours);
 }

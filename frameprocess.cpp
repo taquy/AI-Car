@@ -4,27 +4,26 @@
 #include <imageprocess.h>
 #include <pointsprocess.h>
 #include <laneprocess.h>
+#include <debug.h>
+#include <detector.h>
 
 using namespace std;
 using namespace cv;
 
-// reference angle of API
-double map2 (double x, int in_min, int in_max, int out_min, int out_max){
-    double toReturn =  (double)(1.0 * (x - in_min) * (out_max - out_min) /
-            (in_max - in_min) + out_min );
-    return toReturn;
-}
-
 // reference angle
-double alluse(double angle) {
+void alluse(double &angle) {
     double OA = refer::A - refer::O;
     double OB = refer::O - refer::B;
-    if(angle < 0) return OB/cv::abs(refer::b) * angle + refer::O;
-    return OA/refer::a * angle + refer::O;
+    if(angle < 0){
+       angle = OB/cv::abs(refer::b) * angle + refer::O;
+    } else {
+       angle = OA/refer::a * angle + refer::O;
+    }
+
 }
 
 // get angle from two points
-double getTheta(cv::Point car, cv::Point dst) {
+double getTheta(cv::Point &car, cv::Point &dst) {
     if (dst.x == car.x) return 0;
     if (dst.y == car.y) return (dst.x < car.x ? -90 : 90);
     double pi = acos(-1.0);
@@ -38,8 +37,9 @@ double getTheta(cv::Point car, cv::Point dst) {
     } else{
         angle = -std::atan(dx / dy) * 180 / pi;
     }
-
-    angle = alluse(angle);
+    std::cout << "angle : " << angle << " -- ";
+    alluse(angle);
+    std::cout << angle << std::endl;
 
     return angle;
 }
@@ -53,19 +53,14 @@ double getTheta(cv::Point car, cv::Point dst) {
 double processImg(cv::Mat &src, std::queue<Road> &road_q){
      // prex process image
 
-    cv::Mat roi;
-    roiImg(src, roi, imp::roi);
-
-
-
+    cv::Mat roi = src(imp::roi);
     cv::Mat gray, thres;
+
     cvtColor(roi, gray, CV_BGR2GRAY);
-    threshold(gray, thres, 200, 255, cv::THRESH_BINARY);
+    threshold(gray, thres, conf::THRES, 255, cv::THRESH_BINARY);
 
     cv::Mat b;
     birdView(thres, b);
-
-
 
     // process layer
     std::vector<Layer> layers;
@@ -75,76 +70,66 @@ double processImg(cv::Mat &src, std::queue<Road> &road_q){
         findCenterPoint(layers[i]);
     }
 
+
     // process point
     std::vector<Lane> lanes;
     pointsToLane(layers, lanes);
 
+    std::vector<Lane> copy_lanes = lanes;
+
     // ngaba
-    ngaba(lanes);
-
-    // process lanes
     Road road;
-    separateLeftRight(lanes, road);
+    conf::NGABA = ngaba(lanes, road, src);
+
+    if(!conf::NGABA){
+        // process lanes
+        separateLeftRightByDistance(lanes, road);
+    }
+
+
+    if(road.hasLeft){
+        std::vector<cv::Point> new_cnt;
+        for(cv::Point &p : road.left.cnt){
+            if(p.y > conf::DOWN_Y){
+                new_cnt.push_back(p);
+            } else {
+                break;
+            }
+        }
+        if(new_cnt.size() > 2){
+            road.setLeft(Lane(new_cnt));
+        } else {
+            road.setLeft(Lane());
+            road.hasLeft = false;
+        }
+
+    }
+
+    if(road.hasRight){
+        std::vector<cv::Point> new_cnt;
+        for(cv::Point &p : road.right.cnt){
+            if(p.y > conf::DOWN_Y){
+                new_cnt.push_back(p);
+            } else {
+                break;
+            }
+        }
+
+        if(new_cnt.size() > 2){
+            road.setRight(Lane(new_cnt));
+        } else {
+            road.setRight(Lane());
+            road.hasRight = false;
+        }
+    }
+
     genLine(road, road_q);
-
-
-
     Road new_r = road_q.front();
 
 
     // show images process to debug, don't care about alrogithm
     if(conf::DEBUG){
-        Mat mask = Mat::zeros(conf::H_ROI, 2*conf::W_ROI, CV_8UC3);
-        for(Lane &lane : lanes){
-            for(Point &p : lane.cnt){
-                cv::circle(mask, p, 5,cv::Scalar(0,255,255),-1);
-            }
-        }
-
-        Line *line_left = &new_r.left.line;
-        if(line_left->slope != 0){
-            line(mask, line_left->start, line_left->end, cv::Scalar(0,0,255),2);
-        }
-
-        Line *line_right = &new_r.right.line;
-        if(line_right->slope != 0){
-            line(mask, line_right->start, line_right->end, cv::Scalar(0,255,0),2);
-        }
-
-
-        line(mask, new_r.pointBot,new_r.pointTop,cv::Scalar(0,255,255),6);
-        line(mask, Point(conf::W_ROI, 0),Point(conf::W_ROI, conf::H_ROI),cv::Scalar(255,255,255),6);
-        Rect r(conf::W_ROI, 0, conf::W_ROI, conf::H_ROI);
-        cv::Mat R;
-        R = Mat(mask, r);
-
-        cvtColor(b, b, cv::COLOR_GRAY2BGR);
-        b.copyTo(R);
-
-        Mat mask2 = Mat::zeros(conf::H_ROI + conf::H_CUT, conf::W_CUT, CV_8UC3);
-        r = Rect(0,0, mask.size().width, mask.size().height);
-
-        R = Mat(mask2, r);
-        mask.copyTo(R);
-
-        r = Rect(0,conf::H_ROI, mask2.size().width, conf::H_CUT);
-        R = Mat(mask2, r);
-
-        roi.copyTo(R);
-
-        int H_MASK_NEW = 320;
-        int W_MASK_NEW = (int)(H_MASK_NEW*mask2.size().width/mask2.size().height);
-
-        int H_SRC_NEW = H_MASK_NEW;
-        int W_SRC_NEW = (int)(H_SRC_NEW*conf::WIDTH/conf::HEIGHT);
-
-        resize(mask2, mask2, Size(W_MASK_NEW, H_MASK_NEW));
-        resize(src, src, Size(W_SRC_NEW, H_SRC_NEW));
-
-        Mat mask3;
-        hconcat(mask2, src, mask3);
-        imshow("debug", mask3);
-
+        draw(src, roi, b, road, copy_lanes);
     }
 
     layers.clear();
@@ -170,8 +155,16 @@ int testVideo(string filename){
 
     road_q.push(Road());
 
+    double freq = getTickFrequency();
+    double st = 0, et = 0, fps = 0;
+    double sum_fps = 0;
+
+    Detector *d = new Detector();
+    d->isDebug = true;
+
     while(true){
-        clock_t c1 = clock();
+        st = getTickCount();
+
         Mat frame;
         video >> frame;
 
@@ -180,9 +173,27 @@ int testVideo(string filename){
         }
         num_frames ++;
 
+
+            d->getProxID(frame);
+
+
+            if (d->signId != -1) {
+
+                if (d->signId == Detector::LEFT) {
+                   cout << "This is Left" << endl;
+                    conf::LEFT = 1;
+                } else if (d->signId == Detector::RIGHT)  {
+                    cout << "This is Right" << endl;
+                    conf::LEFT = 0;
+                }
+                cout << conf::LEFT << endl;
+                waitKey();
+            }
+
+
+
+
         double angle = processImg(frame, road_q);
-        std::cout << "angle: " << angle << std::endl;
-//        imshow("frame", frame);
 
         int k = waitKey(conf::WAIT_KEY) & 0xff;
 
@@ -193,9 +204,9 @@ int testVideo(string filename){
             waitKey();
         }
 
-        total_time += (double)(clock() - c1)/CLOCKS_PER_SEC;
-        double average = (double)total_time/num_frames;
-        cout << average << "---" << 1/average << endl << endl;
+        et = getTickCount();
+        sum_fps += 1.0 / ((et-st)/freq);
+        cerr << "FPS: "<< sum_fps/num_frames << '\n';
         frame.release();
     }
     video.release();

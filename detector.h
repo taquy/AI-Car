@@ -1,45 +1,66 @@
 #ifndef DETECTOR_H
 #define DETECTOR_H
 
-class Detector;
+class TrafficSignDetector;
 
-#include "opencv2/objdetect/objdetect.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/core/core.hpp"
-#include <vector>
 #include <iostream>
 
-#include "opencv2/objdetect/objdetect.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
+using namespace std;
 
 #include <opencv2/highgui.hpp>
-#include <opencv2/videoio.hpp>
-
-#include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/objdetect.hpp>
-
-#include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaimgproc.hpp>
 #include <opencv2/cudaobjdetect.hpp>
-
-#include <iostream>
-#include <stdio.h>
-
-using namespace cv;
 
 class Detector
 {
 
-    public:
-      static std::vector<String> signName;
-      static int signId;
+    private:
 
-      static int getID(Mat frame, double &distance, cv::Ptr<cv::cuda::CascadeClassifier> gpuCascade);
-      static std::vector<Rect> detect(Mat frame, CascadeClassifier classifier, int difficulty);
-      static Mat draw(Mat frame, std::vector<Rect> boxes, String label);
+        std::vector<cv::Ptr<cv::cuda::CascadeClassifier>> classifiers;
+
+
+        // Distance calculate
+        double w1;
+        double d1;
+
+        // Image process
+        cv::Mat splitter(cv::Mat img);
+        cv::Rect cropbox(cv::Mat img);
+
+        // Scoring approximate
+
+        int maxFrame;
+        int crrFrame;
+        int *score;
+
+        // Choose detect region
+        void selectRegion();
+
+        // Limit frame detection
+        int fpslimit;
+
+    public:
+      Detector();
+      std::vector<cv::String> signName;
+      double calcDistance (double w2);
+      int getID(cv::Mat frame);
+      void getProxID(cv::Mat frame);
+      void reset();
+      std::vector<cv::Rect> detectGpu(cv::cuda::GpuMat grayMat, int signId);
+      cv::Mat draw(cv::Mat frame, std::vector<cv::Rect> boxes, cv::String label);
+      void detectObject(cv::Mat frame);
+
+      static const int STOP = 0;
+      static const int LEFT = 1;
+      static const int RIGHT = 2;
+
+      static double boundbox[4];
+      static int difficulty[3];
+
+      bool isDetect;
+      bool isDebug;
+
+      int signId;
 };
 
 #endif // DETECTOR_H

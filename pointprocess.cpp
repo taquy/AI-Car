@@ -1,16 +1,10 @@
 #include <iostream>
-
 #include <pointsprocess.h>
 #include <line.h>
 #include <config.h>
 
 int distanceTwoPoints(cv::Point &p1, cv::Point &p2){
     return cv::abs(p1.x - p2.x) + cv::abs(p1.y - p2.y);
-}
-
-float sloptTwoPoints(cv::Point &p1, cv::Point &p2){
-    Line line(p1, p2);
-    return line.slope;
 }
 
 //! This is a recursive function. It finds a point of current layer which is nearest with
@@ -53,12 +47,10 @@ void findRelatedPoint(std::vector<Layer> &layers, std::vector<cv::Point> &points
  * \param isDebug
  */
 void pointsToLane(std::vector<Layer> &layers, std::vector<Lane> &dst_lanes){
-    std::vector<std::vector<cv::Point>> points;
 
     // convert all points of layers to original coornidations;
     for(Layer &l : layers){
        l.toOrigin();
-       points.push_back(l.points);
     }
 
 
@@ -73,7 +65,7 @@ void pointsToLane(std::vector<Layer> &layers, std::vector<Lane> &dst_lanes){
                 x.push_back(layers[i].points[j]);
 
                 findRelatedPoint(layers, x, i+1);
-                if(x.size() > conf::MIN_POINTS){
+                if(x.size() > conf::MIN_POINTS && x[0].y > conf::MIN_Y_LANE){
                     dst_lanes.push_back(Lane(x));
                 }
             }

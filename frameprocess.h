@@ -6,7 +6,7 @@
 #include <road.h>
 #include <string>
 
-double alluse(double angle);
+void alluse(double &angle);
 double processImg(cv::Mat &src, std::queue<Road> &road_q);
 int testVideo(std::string filename);
 

@@ -10,16 +10,10 @@
 
 void separateLayers(cv::Mat &src, std::vector<Layer> &layers);
 
-void concatenateLayers(std::vector<Layer> &layers, cv::Mat &dst);
-
 void birdView(cv::Mat &src, cv::Mat &dst);
-
-void roiImg(cv::Mat &src, cv::Mat &dst , cv::Rect &roi);
 
 void findCnts(cv::Mat &src, std::vector<std::vector<cv::Point>> &contours);
 
 void findCenterPoint(Layer &layer);
-
-void findPoints(Layer &layer);
 
 #endif // IMAGEPROCESS_H

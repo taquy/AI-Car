@@ -3,7 +3,8 @@
 
 #include <opencv2/highgui/highgui.hpp>
 
-void getMatrixWrap(cv::Mat &dst, double w, double h, int bird_alpha);
+void getMatrixWrap(cv::Mat &dst, double w, double h, double alpha,
+                   double focalLength, double dist, double y);
 
 
 

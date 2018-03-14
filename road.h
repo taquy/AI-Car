@@ -9,12 +9,11 @@ class Road{
 public:
     cv::Point pointBot;
     cv::Point pointTop;
-    int widthBot;
-    int widthTop;
+
     Lane right;
     Lane left;
 
-    int num_lanes = 0;
+    bool hasRight, hasLeft;
 
     Road();
 

@@ -8,29 +8,23 @@
 // Line class declaration
 class Line{
 public:
-    float slope;
+    double slope;
+
+    // y = slope*x + c
+    double c;
+
     cv::Point start;
     cv::Point end;
     cv::Point anchor;
 
-    long long A, B, C;
     Line();
 
-    Line(int, int, int, int);
-
-    Line(cv::Point, cv::Point);
-
-    Line(float, cv::Point);
-
-    void lineTransfrom();
-
+    Line(double, cv::Point);
     // toString
     friend std::ostream& operator << (std::ostream& out, const Line line){
         out << "(" << line.start << " , " << line.end << ")" << std::endl;
         return out;
     }
-
-private:
 };
 
 #endif // LINE_H

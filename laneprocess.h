@@ -9,11 +9,9 @@
 
 void drawLanes(std::vector<Lane> &lanes);
 
-int ngaba(std::vector<Lane> &lanes);
+int ngaba(std::vector<Lane> &lanes, Road &road, cv::Mat &src);
 
-void separteByDistance(std::vector<Lane> &lanes, Road &road);
-
-void separateLeftRight(std::vector<Lane> &lanes, Road &road);
+void separateLeftRightByDistance(std::vector<Lane> &lanes, Road &road);
 
 void genLine(Road &road, std::queue<Road> &road_q);
 

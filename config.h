@@ -8,9 +8,10 @@
 namespace conf {
     extern int WIDTH ;
     extern int HEIGHT;
-
+    extern int DOWN_Y;
     extern int Y_CUT;
     extern int MIN_AREA_CNT;
+    extern int MIN_Y_LANE;
 
     extern int H_CUT;
     extern int W_CUT;
@@ -23,6 +24,7 @@ namespace conf {
 
     extern int H_LAYER;
 
+    extern int THRES;
     extern int W_LAYER;
     extern int MIN_DIS_TWO_POINTS;
 
@@ -38,23 +40,17 @@ namespace conf {
 
     extern int SPEED;
     extern int LEFT;
+
     extern int DEBUG;
     extern int WAIT_KEY;
+    extern int NGABA;
     extern int WRITE_VIDEO;
+    extern int isDetect; // khi nao thi detect
 }
 
 namespace imp {
-
-    extern cv::Point middle;
     extern cv::Rect roi;
     extern cv::Rect roiCut;
-    extern cv::Rect roiRight;
-
-    extern Line left;
-    extern Line top;
-    extern Line right;
-    extern Line bottom;
-
     extern cv::Mat matrixWrap;
 }
 

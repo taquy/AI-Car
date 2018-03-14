@@ -20,7 +20,7 @@ LIBS += -L/usr/local/lib -lopencv_cudabgsegm -lopencv_cudaobjdetect -lopencv_cud
 
 LIBS += -L/home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release/ -lkinect-cv2
 
-INCLUDEPATH += /home/ubuntuDriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
+INCLUDEPATH += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
 DEPENDPATH += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release
 
 PRE_TARGETDEPS += /home/ubuntu/DriverlessCarChallenge/jetson/carControl/src/0.3/bin/Release/libkinect-cv2.a
@@ -58,7 +58,8 @@ SOURCES += \
     getparam.cpp \
     laneprocess.cpp \
     detector.cpp \
-    backup.cpp
+    backup.cpp \
+    debug.cpp
 
 HEADERS += \
     line.h \
@@ -73,5 +74,6 @@ HEADERS += \
     readcam.h \
     frameprocess.h \
     getparam.h \
-    detector.h
+    detector.h \
+    debug.h
 
