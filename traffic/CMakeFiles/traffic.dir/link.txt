@@ -1,0 +1,2 @@
+/usr/bin/ar cq ../bin/Release/libtraffic.a  CMakeFiles/traffic.dir/detectorsvm.cpp.o
+/usr/bin/ranlib ../bin/Release/libtraffic.a

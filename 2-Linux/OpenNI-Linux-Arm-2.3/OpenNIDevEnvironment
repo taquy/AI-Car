@@ -1,0 +1,2 @@
+export OPENNI2_INCLUDE=/home/ubuntu/Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Include
+export OPENNI2_REDIST=/home/ubuntu/Downloads/2-Linux/OpenNI-Linux-Arm-2.3/Redist

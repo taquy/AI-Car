@@ -1,0 +1,9 @@
+/home/ubuntu/Desktop/Lane/LIBSCAR/peripheral_driver/i2c/CMakeFiles/i2c-pwm.dir
+/home/ubuntu/Desktop/Lane/LIBSCAR/stereo_vision/CMakeFiles/test-kinect-cv2-2.dir
+/home/ubuntu/Desktop/Lane/include/CMakeFiles/lanedetec.dir
+/home/ubuntu/Desktop/Lane/CMakeFiles/run.dir
+/home/ubuntu/Desktop/Lane/LIBSCAR/HAL/CMakeFiles/HAL.dir
+/home/ubuntu/Desktop/Lane/LIBSCAR/openni2/CMakeFiles/openni2.dir
+/home/ubuntu/Desktop/Lane/traffic/CMakeFiles/traffic.dir
+/home/ubuntu/Desktop/Lane/LIBSCAR/stereo_vision/CMakeFiles/kinect-cv2.dir
+/home/ubuntu/Desktop/Lane/LIBSCAR/stereo_vision/CMakeFiles/test-kinect-cv2.dir

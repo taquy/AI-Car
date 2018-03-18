@@ -1,0 +1,68 @@
+WIDTH = 640
+HEIGHT = 480
+
+// Region of lane
+X_CUT = 0
+Y_CUT = 180
+Y_BOT_OFFSET = 0
+//W_CUT = WIDTH
+//H_CUT = HEIGHT - Y_CUT - Y_BOT_OFFSET
+// Region of birdview which will be taked from region of lane
+W_ROI = 140
+//X_ROI = (int)(W_CUT - W_ROI)/2
+Y_ROI = 0
+//H_ROI = H_CUT - Y_ROI
+
+
+// config for image processing
+THRES = 220
+NUMLAYERS = 25;
+MIN_AREA_CNT = 20;
+
+DOWN_Y = 80;
+
+// Region of layer
+//H_LAYER = (int)(H_ROI / NUMLAYERS);
+//W_LAYER = W_ROI;
+
+
+//MIN_DIS_TWO_POINTS = H_LAYER*3;
+
+// Point center of region's bird
+//X_CENTER = (int) (W_ROI/2);
+//Y_CENTER = H_ROI;
+
+
+MIN_POINTS = 5;
+
+// Distace between two line, use for processing one lane;
+DIS_GEN_LINE_TOP = 30;
+DIS_GEN_LINE_BOT = 35;
+
+// distance between Intersection and lowest line, use for prosseing road injection
+DIS_ROAD_INJUCTION = 150;
+
+
+// speed of car
+SPEED = 50;
+LEFT = 0;
+DEBUG = 0;
+WAIT_KEY = 0;
+
+NGABA = 0;
+WRITE_VIDEO = 0;
+
+// reference
+A = 200;
+O = 0;
+B = -200;
+a = 22;
+b = -22;
+
+
+// birdview
+ALPHA = 10
+F = 1500
+DIST = 205
+Y = 70;
+

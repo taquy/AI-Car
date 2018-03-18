@@ -1,0 +1,3 @@
+/home/ubuntu/Desktop/Lane/LIBSCAR/peripheral_driver/i2c/CMakeFiles/i2c-pwm.dir
+/home/ubuntu/Desktop/Lane/LIBSCAR/peripheral_driver/uart/CMakeFiles/uart.dir
+/home/ubuntu/Desktop/Lane/LIBSCAR/peripheral_driver/uart/CMakeFiles/test-uart.dir
